@@ -8,3 +8,14 @@ steps:
     qualifyImageName: false
     includeLatestTag: true
 
+    steps:
+- task: Docker@0
+  displayName: 'Push an image'
+  inputs:
+    containerregistrytype: 'Container Registry'
+    dockerRegistryConnection: ConnectionDocker
+    action: 'Push an image'
+    imageName: saurya123789/indianncpldemo
+    qualifyImageName: false
+    includeLatestTag: true
+
