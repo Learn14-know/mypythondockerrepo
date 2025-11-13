@@ -14,10 +14,7 @@ variables:
   k8sManifest: azure-aks.yaml
 
 stages:
-
-# ---------------------------
  stage: Build
-  displayName: 'Build and Push Docker Image'
   jobs:
     - job: Build
       displayName: 'Build and Push an image'
