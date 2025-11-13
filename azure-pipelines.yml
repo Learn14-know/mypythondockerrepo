@@ -8,7 +8,8 @@ steps:
     qualifyImageName: false
     includeLatestTag: true
 
-    steps:
+
+steps:
 - task: Docker@0
   displayName: 'Push an image'
   inputs:
@@ -18,4 +19,28 @@ steps:
     imageName: saurya123789/indianncpldemo
     qualifyImageName: false
     includeLatestTag: true
+
+steps:
+- task: KubernetesManifest@1
+  displayName: deploy
+  inputs:
+    connectionType: azureResourceManager
+    azureSubscriptionConnection: AzureConnect
+    azureResourceGroup: NCPLindia
+    kubernetesCluster: myAKSCluster
+    namespace: default
+    manifests: 'azure-aks.yaml'
+
+steps:
+- task: Kubernetes@1
+  displayName: 'kubectl apply'
+  inputs:
+    connectionType: 'Azure Resource Manager'
+    azureSubscriptionEndpoint: AzureConnect
+    azureResourceGroup: NCPLindia
+    kubernetesCluster: myAKSCluster
+    namespace: default
+    command: apply
+    useConfigurationFile: true
+    configuration: 'azure-aks.yaml'
 
