@@ -29,14 +29,23 @@ stages:
       - task: Checkout@1
 
       - task: Docker@0
-        displayName: 'Build and Push Docker Image'
-        inputs:
-          command: buildAndPush
-          containerRegistry: $(dockerConnection)
-          repository: $(imageName)
-          Dockerfile: '**/Dockerfile'
-          tags: |
-            latest
+  displayName: 'Build an image'
+  inputs:
+    containerregistrytype: 'Container Registry'
+    dockerRegistryConnection: ConnectionDocker
+    imageName: saurya123789/indianncpldemo
+    qualifyImageName: false
+    includeLatestTag: true
+
+- task: Docker@0
+  displayName: 'Push an image'
+  inputs:
+    containerregistrytype: 'Container Registry'
+    dockerRegistryConnection: ConnectionDocker
+    action: 'Push an image'
+    imageName: saurya123789/indianncpldemo
+    qualifyImageName: false
+    includeLatestTag: true
 
 # ---------------------------
 # Stage 2: Deploy to AKS
