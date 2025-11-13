@@ -22,14 +22,13 @@ stages:
   displayName: 'Build and Push Docker Image'
   jobs:
   - job: Build
-    displayName: 'Build & Push'
+    displayName: 'Build and Push an image'
     pool:
       vmImage: 'ubuntu-latest'
     steps:
       - task: Checkout@1
 steps:
       - task: Docker@0
-  displayName: 'Build an image'
   inputs:
     containerregistrytype: 'Container Registry'
     dockerRegistryConnection: ConnectionDocker
@@ -39,7 +38,6 @@ steps:
     
 steps:
 - task: Docker@0
-  displayName: 'Push an image'
   inputs:
     containerregistrytype: 'Container Registry'
     dockerRegistryConnection: ConnectionDocker
