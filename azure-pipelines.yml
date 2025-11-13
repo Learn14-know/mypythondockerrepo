@@ -14,35 +14,25 @@ variables:
   namespace: default
 
 jobs:
-- job: Build_And_Deploy
-  displayName: Build, Push Docker image and Deploy to AKS
+- job: BuildAndDeploy
+  displayName: Build, Push Docker Image and Deploy to AKS
   steps:
 
     # Checkout the code
     - task: Checkout@1
 
-    # Build Docker image
-    - task: Docker@0
-      displayName: 'Build Docker image'
+    # Build and push Docker image using Docker@2
+    - task: Docker@2
+      displayName: 'Build and Push Docker Image'
       inputs:
-        containerregistrytype: 'Container Registry'
-        dockerRegistryConnection: $(dockerConnection)
-        imageName: $(imageName)
-        qualifyImageName: false
-        includeLatestTag: true
+        command: buildAndPush
+        containerRegistry: $(dockerConnection)
+        repository: $(imageName)
+        Dockerfile: '**/Dockerfile'
+        tags: |
+          latest
 
-    # Push Docker image
-    - task: Docker@0
-      displayName: 'Push Docker image'
-      inputs:
-        containerregistrytype: 'Container Registry'
-        dockerRegistryConnection: $(dockerConnection)
-        action: 'Push an image'
-        imageName: $(imageName)
-        qualifyImageName: false
-        includeLatestTag: true
-
-    # Deploy using KubernetesManifest task
+    # Deploy using KubernetesManifest@1
     - task: KubernetesManifest@1
       displayName: 'Deploy to AKS'
       inputs:
@@ -53,7 +43,7 @@ jobs:
         namespace: $(namespace)
         manifests: $(k8sManifest)
 
-    # Optional: apply manifest using kubectl (redundant if above works)
+    # Optional: kubectl apply as a fallback (can remove if KubernetesManifest works)
     - task: Kubernetes@1
       displayName: 'kubectl apply'
       inputs:
@@ -65,5 +55,6 @@ jobs:
         command: apply
         useConfigurationFile: true
         configuration: $(k8sManifest)
+
 
 
