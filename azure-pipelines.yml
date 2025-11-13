@@ -1,46 +1,69 @@
-steps:
-- task: Docker@0
-  displayName: 'Build an image'
-  inputs:
-    containerregistrytype: 'Container Registry'
-    dockerRegistryConnection: ConnectionDocker
-    imageName: saurya123789/indianncpldemo
-    qualifyImageName: false
-    includeLatestTag: true
+trigger:
+- main
 
+pool:
+  vmImage: 'ubuntu-latest'
 
-steps:
-- task: Docker@0
-  displayName: 'Push an image'
-  inputs:
-    containerregistrytype: 'Container Registry'
-    dockerRegistryConnection: ConnectionDocker
-    action: 'Push an image'
-    imageName: saurya123789/indianncpldemo
-    qualifyImageName: false
-    includeLatestTag: true
+variables:
+  imageName: saurya123789/indianncpldemo
+  dockerConnection: ConnectionDocker
+  azureSubscription: AzureConnect
+  azureResourceGroup: NCPLindia
+  aksCluster: myAKSCluster
+  k8sManifest: azure-aks.yaml
+  namespace: default
 
-steps:
-- task: KubernetesManifest@1
-  displayName: deploy
-  inputs:
-    connectionType: azureResourceManager
-    azureSubscriptionConnection: AzureConnect
-    azureResourceGroup: NCPLindia
-    kubernetesCluster: myAKSCluster
-    namespace: default
-    manifests: 'azure-aks.yaml'
+jobs:
+- job: Build_And_Deploy
+  displayName: Build, Push Docker image and Deploy to AKS
+  steps:
 
-steps:
-- task: Kubernetes@1
-  displayName: 'kubectl apply'
-  inputs:
-    connectionType: 'Azure Resource Manager'
-    azureSubscriptionEndpoint: AzureConnect
-    azureResourceGroup: NCPLindia
-    kubernetesCluster: myAKSCluster
-    namespace: default
-    command: apply
-    useConfigurationFile: true
-    configuration: 'azure-aks.yaml'
+    # Checkout the code
+    - task: Checkout@1
+
+    # Build Docker image
+    - task: Docker@0
+      displayName: 'Build Docker image'
+      inputs:
+        containerregistrytype: 'Container Registry'
+        dockerRegistryConnection: $(dockerConnection)
+        imageName: $(imageName)
+        qualifyImageName: false
+        includeLatestTag: true
+
+    # Push Docker image
+    - task: Docker@0
+      displayName: 'Push Docker image'
+      inputs:
+        containerregistrytype: 'Container Registry'
+        dockerRegistryConnection: $(dockerConnection)
+        action: 'Push an image'
+        imageName: $(imageName)
+        qualifyImageName: false
+        includeLatestTag: true
+
+    # Deploy using KubernetesManifest task
+    - task: KubernetesManifest@1
+      displayName: 'Deploy to AKS'
+      inputs:
+        connectionType: 'Azure Resource Manager'
+        azureSubscriptionConnection: $(azureSubscription)
+        azureResourceGroup: $(azureResourceGroup)
+        kubernetesCluster: $(aksCluster)
+        namespace: $(namespace)
+        manifests: $(k8sManifest)
+
+    # Optional: apply manifest using kubectl (redundant if above works)
+    - task: Kubernetes@1
+      displayName: 'kubectl apply'
+      inputs:
+        connectionType: 'Azure Resource Manager'
+        azureSubscriptionEndpoint: $(azureSubscription)
+        azureResourceGroup: $(azureResourceGroup)
+        kubernetesCluster: $(aksCluster)
+        namespace: $(namespace)
+        command: apply
+        useConfigurationFile: true
+        configuration: $(k8sManifest)
+
 
