@@ -6,9 +6,9 @@ variables:
   imageName: indianncpldemo12
 
   # AKS
-  azureSubscription: AKSconnect
-  azureResourceGroup: NCPLindia
-  aksCluster: myAKSCluster
+  azureSubscription: Terraform_connect
+  azureResourceGroup: rg-dev-akscluster
+  aksCluster: my-aks-cluster
   namespace: default
   k8sManifest: azure-aks.yaml
 
@@ -31,7 +31,7 @@ stages:
         - task: AzureCLI@2
           displayName: 'Build and Push Docker Image via Azure CLI'
           inputs:
-            azureSubscription: ACRconnect
+            azureSubscription: Terraform_connect
             scriptType: bash
             scriptLocation: inlineScript
             inlineScript: |
