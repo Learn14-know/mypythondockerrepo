@@ -60,7 +60,7 @@ stages:
           displayName: 'Deploy using KubernetesManifest'
           inputs:
             action: deploy
-            kubernetesServiceEndpoint: KubernetesConnect
+            kubernetesServiceEndpoint: Kubernetes_connect
             namespace: $(namespace)
             manifests: |
               $(k8sManifest)
@@ -70,7 +70,7 @@ stages:
           displayName: 'kubectl apply fallback'
           inputs:
             connectionType: 'Kubernetes Service Connection'
-            kubernetesServiceEndpoint: KubernetesConnect
+            kubernetesServiceEndpoint: Kubernetes_connect
             namespace: $(namespace)
             command: apply
             useConfigurationFile: true
