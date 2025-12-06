@@ -7,8 +7,8 @@ variables:
 
   # AKS
   azureSubscription: Terraform_connect
-  azureResourceGroup: rg-dev-akscluster
-  aksCluster: my-aks-cluster
+  azureResourceGroup: rg-stage-akscluster
+  aksCluster: stage-akscluster
   namespace: default
   k8sManifest: azure-aks.yaml
 
